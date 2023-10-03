@@ -1,4 +1,4 @@
-package com.campusdual.socialnetwork.utils;
+package com.campusdual.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -9,6 +9,8 @@ import java.util.Random;
 
 public class Utils {
 
+
+
     private Utils(){}
 
     public static final Random random = new Random();
@@ -18,7 +20,6 @@ public class Utils {
      * Method to initialize input data.
      * @return input Buffered string data.
      */
-
     public static String init() {
         String buffer = "";
         InputStreamReader stream = new InputStreamReader(System.in);
@@ -35,7 +36,6 @@ public class Utils {
      * Method to get an integer from input data.
      * @return integer entered by the user.
      */
-
     public static int integer() {
         return Utils.integer(null);
     }
@@ -45,7 +45,6 @@ public class Utils {
      * @param message custom message for the user.
      * @return integer entered by the user.
      */
-
     public static int integer(String message) {
         if (message != null) {
             System.out.print(message);
@@ -64,7 +63,6 @@ public class Utils {
      * Method to get a real number from input data.
      * @return real number entered by the user.
      */
-
     public static double real() {
         return Utils.real(null);
     }
@@ -74,7 +72,6 @@ public class Utils {
      * @param message custom message for the user.
      * @return real number entered by the user.
      */
-
     public static double real(String message) {
         if (message != null) {
             System.out.print(message);
@@ -92,7 +89,6 @@ public class Utils {
      * Method to get a text string from input data.
      * @return text string entered by the user.
      */
-
     public static String string() {
         return Utils.string(null);
     }
@@ -103,7 +99,6 @@ public class Utils {
      * @param message custom message for the user.
      * @return text string entered by the user.
      */
-
     public static String string(String message) {
         if (message != null) {
             System.out.print(message);
@@ -115,7 +110,6 @@ public class Utils {
      * Method to get a character from input data.
      * @return character entered by the user.
      */
-
     public static char character() {
         return Utils.character(null);
     }
@@ -125,7 +119,6 @@ public class Utils {
      * @param message custom message for the user.
      * @return character entered by the user.
      */
-
     public static char character(String message) {
         if (message != null) {
             System.out.print(message);
@@ -141,7 +134,6 @@ public class Utils {
      *            el valor a transformar
      * @return El double formateado
      */
-
     public static String formatLocalNumber(double d) {
         return dF.format(d);
     }
@@ -156,7 +148,6 @@ public class Utils {
      *            El límite superior del rango
      * @return Un número aleatorio entre el rango seleccionado.
      */
-
     public static int getRandomNumberInRange(int min, int max) {
         max++;
         return random.nextInt(max - min) + min;
@@ -172,7 +163,6 @@ public class Utils {
      *            <code>true</code> para esperar despues de mostrar la lista,
      *            <code>false</code> en caso contrario.
      */
-
     public static <T> void showFromList(List<T> list, boolean wait) {
         Utils.showFromList(list, wait, null);
     }
@@ -191,7 +181,6 @@ public class Utils {
      *            Excluye los elementos que existan en esta lista de la lista
      *            pasada por parámetro
      */
-
     public static <T> void showFromList(List<T> list, boolean wait, List<T> excludeElements) {
         StringBuilder builder = new StringBuilder();
         List<Object> auxList = new ArrayList<>();
@@ -213,6 +202,49 @@ public class Utils {
     }
 
     /**
+     * Devuelve una cadena de texto como representación de una lista, opcionalmente numerados.
+     *
+     * @param list           La lista de elementos que se mostrarán en la representación de cadena.
+     * @param id             Un indicador booleano que determina si los elementos deben ser numerados.
+     * @param <T>            El tipo de elementos contenidos en la lista.
+     * @return Una cadena que representa los elementos de la lista, opcionalmente numerados.
+     */
+    public static <T> String returnShowFromList(List<T> list, boolean id) {
+        return Utils.returnShowFromList(list, id, null);
+    }
+
+    /**
+     * Devuelve una cadena de texto como representación de una lista, opcionalmente numerados,
+     * excluyendo elementos especificados en otra lista.
+     *
+     * @param list           La lista de elementos que se mostrarán en la representación de cadena.
+     * @param id             Un indicador booleano que determina si los elementos deben ser numerados.
+     * @param excludeElements Una lista de elementos que se deben excluir de la representación de cadena,
+     *                       puede ser nula si no se desean excluir elementos.
+     * @param <T>            El tipo de elementos contenidos en la lista.
+     * @return Una cadena que representa los elementos de la lista, opcionalmente numerados y excluyendo
+     *         los elementos especificados en {@code excludeElements}.
+     */
+    public static <T> String returnShowFromList(List<T> list, boolean id, List<T> excludeElements) {
+        StringBuilder builder = new StringBuilder();
+        List<Object> auxList = new ArrayList<>();
+        auxList.addAll(list);
+        if (excludeElements != null) {
+            auxList.removeAll(excludeElements);
+        }
+        for (int i = 0; i < auxList.size(); i++) {
+            builder.append("\t");
+            if (id) {
+                builder.append(i + 1);
+                builder.append(". ");
+            }
+            builder.append(auxList.get(i).toString());
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+
+    /**
      * Devuelve un array de un elemento con la opción seleccionada de la lista,
      * y con la opción de poder cancelar esa opción
      *
@@ -224,7 +256,6 @@ public class Utils {
      * @return Un array de un elemento con la posición que ocupa el elemento
      *         seleccionado en la lista
      */
-
     public static <T> List<T> showAndSelectFromList(List<T> list, boolean cancel) {
         return Utils.showAndSelectFromList(list, cancel, false);
     }
@@ -350,4 +381,5 @@ public class Utils {
     public static boolean checkSelection(int i, int size) {
         return (i >= 1) && (i <= size);
     }
+
 }
