@@ -22,7 +22,7 @@ public class Post {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     private Date postDate;
     private String title;
-    private List<com.campusdual.Comment> commentList = new ArrayList<>();
+    private List<Comment> commentList = new ArrayList<>();
 
     // Constructor.
 
@@ -30,7 +30,7 @@ public class Post {
 
         this.title = title;
         this.postDate = new Date();
-        this.createPost();
+        this.incrementGlobalIdPost();
 
     }
 
@@ -51,7 +51,7 @@ public class Post {
     public String getTitle() {
         return this.title;
     }
-    public List<com.campusdual.Comment> getCommentList() {
+    public List<Comment> getCommentList() {
         return this.commentList;
     }
     public SimpleDateFormat getSdf() {
@@ -61,34 +61,48 @@ public class Post {
         return this.getSdf().format(this.getPostDate());
     }
 
-    // Methods.
+    // METHODS.
 
-    private void createPost() {
+    // Aumenta el ID con el que se crea un Post.
+
+    private void incrementGlobalIdPost() {
 
         this.postId = Post.globalId;
         Post.globalId++;
 
     }
 
-    public void addComment(User user) {
+    // Añade un comentario a la lista de comentarios de un post y también a la lista del usuario que lo escribe (sin Utils).
 
-        String commentText = Utils.string("Enter a comment: ");
+    public void addComment (String commentText, User u){
 
-        com.campusdual.Comment comment = new com.campusdual.Comment(commentText, user);
+        Comment comment = new Comment(commentText, u);
 
         this.getCommentList().add(comment);
-        user.addComment(comment);
+        u.addComment(comment);
         comment.setPost(this);
 
     }
 
-    public  void addComment(String commentText, User user){
+    // Añade un comentario a la lista de comentarios de un post y también a la lista de comentarios del usuario que lo escribe (con utils).
 
-        com.campusdual.Comment comment = new com.campusdual.Comment(commentText, user);
+    public void addComment (User u) {
+
+        String commentText = Utils.string("Enter a comment: ");
+
+        Comment comment = new Comment(commentText, u);
 
         this.getCommentList().add(comment);
-        user.addComment(comment);
+        u.addComment(comment);
         comment.setPost(this);
+
+    }
+
+    // Borra un comentario de la lista de comentarios de un post.
+
+    public void deleteComment (Comment c){
+
+        this.getCommentList().remove(c);
 
     }
 

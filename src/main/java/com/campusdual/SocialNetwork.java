@@ -35,7 +35,7 @@ public class SocialNetwork {
 		this.activeUser = activeUser;
 	}
 
-	// Main.
+	// MAIN.
 
 	public static void main(String[] args) {
 
@@ -45,7 +45,7 @@ public class SocialNetwork {
 
 	}
 
-	// Methods.
+	// DEFAULT DATA.
 
 	private void populateNetwork() {
 
@@ -89,6 +89,8 @@ public class SocialNetwork {
 
 	}
 
+	// METHODS & MENUS.
+
 	public void init() {
 
 		int opt;
@@ -130,32 +132,6 @@ public class SocialNetwork {
 
 		} while (opt != 0);
 
-	}
-
-	private void login() {
-
-		String username = Utils.string("Enter your username: ");
-
-		for (User u : this.getSocialNetworkUserList()) {
-
-			if (username.equals(u.getName())) {
-
-				this.setActiveUser(u);
-				break;
-
-			}
-
-		}
-
-		if (this.getActiveUser() != null) {
-
-			this.showLoginOptions();
-
-		} else {
-
-			System.out.println("\n" + "Username does not exist");
-
-		}
 	}
 
 	private void showLoginOptions() {
@@ -264,12 +240,13 @@ public class SocialNetwork {
 
 				case 2:
 
-					this.addFriends();
+					this.addFriend();
 					break;
 
 				case 3:
 
-					this.deleteFriends();
+					this.deleteFriend();
+					this.deleteFriend();
 					break;
 
 				case 4:
@@ -298,13 +275,180 @@ public class SocialNetwork {
 
 	}
 
+	private void addUser() {
+
+		String username = Utils.string("Enter a username: ");
+
+		User user = new User(username);
+
+		this.getSocialNetworkUserList().add(user);
+
+	}
+
+	private void login() {
+
+		String username = Utils.string("Enter your username: ");
+
+		for (User u : this.getSocialNetworkUserList()) {
+
+			if (username.equals(u.getName())) {
+
+				this.setActiveUser(u);
+				break;
+
+			}
+
+		}
+
+		if (this.getActiveUser() != null) {
+
+			this.showLoginOptions();
+
+		} else {
+
+			System.out.println("\n" + "Username does not exist");
+
+		}
+
+	}
+
+	private void addFriend() {
+
+		List<User> users = this.getActiveUser().friendsSuggestion();
+
+		if (!users.isEmpty()) {
+
+			System.out.println("\n" + "We recommend that you follow one of these users:\n");
+			System.out.println(Utils.returnShowFromList(users, false));
+
+		}
+
+		System.out.println("\n" + "App users you don't follow yet: ");
+
+		List<User> friendsAndMe = new ArrayList<>(this.getActiveUser().getFriendList());
+		friendsAndMe.add(this.getActiveUser());
+
+		List<User> userList = Utils.showAndSelectFromList(this.getSocialNetworkUserList(), false, false, friendsAndMe);
+
+		if (!userList.isEmpty()) {
+
+			this.getActiveUser().addFriend(userList.get(0));
+
+		}
+
+	}
+
+	private void deleteFriend() {
+
+		System.out.println("Indicate the friend you want to unfollow: ");
+
+		List<User> userList = Utils.showAndSelectFromList(this.getActiveUser().getFriendList(), true);
+
+		if (!userList.isEmpty()) {
+
+			this.getActiveUser().getFriendList().remove(userList.get(0));
+
+		}
+
+	}
+
+	private void addPost() {
+
+		int opt = Utils.integer("What type of post do you want to add??:\n1.- Text\n2.- Image\n3.- Video\nChoose an option: ");
+
+		String title = Utils.string("Enter a title: ");
+
+		switch (opt) {
+
+			case 1:
+
+				String content = Utils.string("Enter the content: ");
+
+				PostText textPost = new PostText(title, content);
+
+				this.getActiveUser().addPost(textPost);
+				this.getSocialNetworkPostList().add(textPost);
+				break;
+
+			case 2:
+
+				String dimension = Utils.string("Enter the dimensions: ");
+
+				PostImage imagePost = new PostImage(title, dimension);
+
+				this.getActiveUser().addPost(imagePost);
+				this.getSocialNetworkPostList().add(imagePost);
+				break;
+
+			case 3:
+
+				String quality = Utils.string("Enter the quality: ");
+				int duration = Utils.integer("Enter the duration (in seconds): ");
+
+				PostVideo videoPost = new PostVideo(title, quality, duration);
+
+				this.getActiveUser().addPost(videoPost);
+				this.getSocialNetworkPostList().add(videoPost);
+				break;
+
+			default:
+
+				System.out.println("Invalid option");
+				break;
+
+		}
+
+	}
+
+	private void commentPost() {
+
+		int idPost = Utils.integer("\n" + "Enter the ID of the post you want to comment on: ");
+
+		Post p = this.findPostById(idPost);
+
+		if (p != null) {
+
+			System.out.println(p);
+			p.addComment(this.getActiveUser());
+
+		}
+
+	}
+
+	private void deleteMyPost() {
+
+		System.out.println("Indicate the post you want to delete: ");
+
+		List<Post> postsList = Utils.showAndSelectFromList(this.getActiveUser().getPostList(), true);
+
+		if (!postsList.isEmpty()) {
+
+			Post post = postsList.get(0);
+
+			for (Comment c : post.getCommentList()) {
+
+				c.getUser().getCommentList().remove(c);
+
+			}
+
+			this.getActiveUser().getPostList().remove(post);
+			this.getSocialNetworkPostList().remove(post);
+
+		}
+
+	}
+
 	private void deleteMyAccount() {
 
 		String opt = Utils.string("Are you sure about deleting your account? (Y)es / (N)o: ");
 
 		if (opt.equalsIgnoreCase("y")){
 
-			for (Comment c : this.getActiveUser().getCommentList()) { c.getPost().getCommentList().remove(c); }
+			for (Comment c : this.getActiveUser().getCommentList()) {
+
+				c.getPost().getCommentList().remove(c);
+
+			}
 
 			for(Post p : this.getActiveUser().getPostList()) {
 
@@ -352,89 +496,10 @@ public class SocialNetwork {
 
 	}
 
-	private void deleteMyPost() {
-
-		System.out.println("Indicate the post you want to delete: ");
-
-		List<Post> postsList = Utils.showAndSelectFromList(this.getActiveUser().getPostList(), true);
-
-		if (!postsList.isEmpty()) {
-
-			Post post = postsList.get(0);
-
-			for (Comment c : post.getCommentList()) {
-
-				c.getUser().getCommentList().remove(c);
-
-			}
-
-			this.getActiveUser().getPostList().remove(post);
-			this.getSocialNetworkPostList().remove(post);
-
-		}
-
-	}
-
-	private void deleteFriends() {
-
-		System.out.println("Indicate the friend you want to unfollow: ");
-
-		List<User> userList = Utils.showAndSelectFromList(this.getActiveUser().getFriendList(), true);
-
-		if (!userList.isEmpty()) {
-
-			this.getActiveUser().getFriendList().remove(userList.get(0));
-
-		}
-
-	}
-
-
-	private void addFriends() {
-
-		List<User> users = this.getActiveUser().friendsSuggestion();
-
-		if (!users.isEmpty()) {
-
-			System.out.println("\n" + "We recommend that you follow one of these users:\n");
-			System.out.println(Utils.returnShowFromList(users, false));
-
-		}
-
-		System.out.println("\n" + "App users you don't follow yet: ");
-
-		List<User> friendsAndMe = new ArrayList<>(this.getActiveUser().getFriendList());
-		friendsAndMe.add(this.getActiveUser());
-
-		List<User> userList = Utils.showAndSelectFromList(this.getSocialNetworkUserList(), false, false, friendsAndMe);
-
-		if (!userList.isEmpty()) {
-
-			this.getActiveUser().addFriend(userList.get(0));
-
-		}
-
-	}
-
 	private void showCommentFromUsers() {
 
 		List<User> users = Utils.showAndSelectFromList(this.getSocialNetworkUserList(), false);
 		Utils.showFromList(users.get(0).getCommentList(), false);
-
-	}
-
-	private void commentPost() {
-
-		int idPost = Utils.integer("\n" + "Enter the ID of the post you want to comment on: ");
-
-		Post p = this.findPostById(idPost);
-
-		if (p != null) {
-
-			System.out.println(p);
-			p.addComment(this.getActiveUser());
-
-		}
 
 	}
 
@@ -493,80 +558,158 @@ public class SocialNetwork {
 
 		Utils.showFromList(users.get(0).getPostList(), false);
 
-        /*
-        for (int i = 0; i < this.getSocialNetworkUser().size(); i++) { System.out.println(i+" "+this.getSocialNetworkUser().get(i)); }
-        int opt = Utils.integer("Selecciona el numero del usuario: ");
-        for (Post p : this.getSocialNetworkUser().get(opt).getPostList()) { System.out.println(p); }
-         */
-
 	}
 
 	private void showMyPost() {
 
 		Utils.showFromList(this.getActiveUser().getPostList(), false);
 
-        /*
-        for (Post p : this.getActiveUser().getPostList()){ System.out.println(p); }
-        */
-
 	}
 
-	private void addPost() {
+	// TESTING METHODS.
 
-		int opt = Utils.integer("What type of post do you want to add??:\n1.- Text\n2.- Image\n3.- Video\nChoose an option: ");
-
-		String title = Utils.string("Enter a title: ");
-
-		switch (opt) {
-
-			case 1:
-
-				String content = Utils.string("Enter the content: ");
-
-				PostText textPost = new PostText(title, content);
-
-				this.getActiveUser().addPost(textPost);
-				this.getSocialNetworkPostList().add(textPost);
-				break;
-
-			case 2:
-
-				String dimension = Utils.string("Enter the dimensions: ");
-
-				PostImage imagePost = new PostImage(title, dimension);
-
-				this.getActiveUser().addPost(imagePost);
-				this.getSocialNetworkPostList().add(imagePost);
-				break;
-
-			case 3:
-
-				String quality = Utils.string("Enter the quality: ");
-				int duration = Utils.integer("Enter the duration (in seconds): ");
-
-				PostVideo videoPost = new PostVideo(title, quality, duration);
-
-				this.getActiveUser().addPost(videoPost);
-				this.getSocialNetworkPostList().add(videoPost);
-				break;
-
-			default:
-
-				System.out.println("Invalid option");
-				break;
-
-		}
-
-	}
-
-	private void addUser() {
-
-		String username = Utils.string("Enter a username: ");
+	public void addUserTmp (String username) {
 
 		User user = new User(username);
 
 		this.getSocialNetworkUserList().add(user);
 
 	}
+
+	public void loginTmp (String username) {
+
+		for (User u : this.getSocialNetworkUserList()) {
+
+			if (username.equals(u.getName())) {
+
+				this.setActiveUser(u);
+				break;
+
+			}
+
+		}
+
+	}
+
+	public void addFriendTmp (User u) {
+
+		this.getActiveUser().getFriendList().add(u);
+
+	}
+
+	public void deleteFriendTmp (User u) {
+
+		this.getActiveUser().getFriendList().remove(u);
+
+	}
+
+	public void addPostTextTmp (String title, String content) {
+
+		PostText postText = new PostText(title, content);
+
+		this.getActiveUser().addPost(postText);
+		this.getSocialNetworkPostList().add(postText);
+
+	}
+
+	public void addPostImageTmp (String title, String dimension) {
+
+		PostImage postImage = new PostImage(title, dimension);
+
+		this.getActiveUser().addPost(postImage);
+		this.getSocialNetworkPostList().add(postImage);
+
+	}
+
+	public void addPostVideoTmp (String title, String quality, int duration) {
+
+		PostVideo postVideo = new PostVideo(title, quality, duration);
+
+		this.getActiveUser().addPost(postVideo);
+		this.getSocialNetworkPostList().add(postVideo);
+
+	}
+
+	public void commentPostTmp (String commentText, Post post) {
+
+		post.addComment(commentText, this.getActiveUser());
+
+	}
+
+	public void deleteMyPostTmp(Post p) {
+
+		for (Comment c : p.getCommentList()) {
+
+			c.getUser().getCommentList().remove(c);
+
+		}
+
+		this.getActiveUser().getPostList().remove(p);
+		this.getSocialNetworkPostList().remove(p);
+
+	}
+
+	public void deleteMyCommentTmp(Comment c) {
+
+		c.getPost().getCommentList().remove(c);
+		this.getActiveUser().getCommentList().remove(c);
+
+	}
+
+
+	/*
+
+	public void deleteMyPostTmp (Post p) {
+
+		for (Comment c : p.getCommentList()) {
+
+			c.getUser().getCommentList().remove(c);
+
+		}
+
+		this.getActiveUser().getPostList().remove(p);
+		this.getSocialNetworkPostList().remove(p);
+
+	}
+
+
+
+
+	public void deleteMyAccountTmp(User u) {
+
+		for (Comment c : this.getActiveUser().getCommentList()) {
+
+			c.getPost().getCommentList().remove(c);
+
+		}
+
+		for(Post p : this.getActiveUser().getPostList()) {
+
+			for (Comment c : p.getCommentList()) {
+
+				c.getPost().getCommentList().remove(c);
+
+			}
+
+			this.getSocialNetworkPostList().remove(p);
+
+		}
+
+		this.getActiveUser().getCommentList().clear();
+		this.getActiveUser().getPostList().clear();
+
+		for (User u : this.getSocialNetworkUserList()) {
+
+			u.getFriendList().remove(this.getActiveUser());
+
+		}
+
+		this.setActiveUser(null);
+
+		this.init();
+
+	}
+
+	 */
 
 }

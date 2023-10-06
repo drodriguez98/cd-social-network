@@ -16,8 +16,8 @@ public class User {
 
     private String name;
     private List <User> friendList= new ArrayList<>();
-    private List <com.campusdual.Post> postList = new LinkedList<>();
-    private List <com.campusdual.Comment> commentList = new ArrayList<>();
+    private List <Post> postList = new LinkedList<>();
+    private List <Comment> commentList = new ArrayList<>();
 
     // Constructor.
 
@@ -35,20 +35,62 @@ public class User {
     public List <User> getFriendList() {
         return this.friendList;
     }
-    public List <com.campusdual.Post> getPostList() {
+    public List <Post> getPostList() {
         return this.postList;
     }
-    public List <com.campusdual.Comment> getCommentList() { return this.commentList; }
+    public List <Comment> getCommentList() { return this.commentList; }
 
-    // Methods.
+    // METHODS.
 
-    public void addPost (com.campusdual.Post p) { ((LinkedList) this.getPostList()).addFirst(p); }
-    public void addFriend (User u){
+    // Añade un usuario a la lista de amigos de un usuario.
+
+    public void addFriend (User u) {
+
         this.getFriendList().add(u);
+
     }
-    public void addComment (com.campusdual.Comment comment) {
-        this.getCommentList().add(comment);
+
+    // Añade un post a la lista de posts de un usuario.
+
+    public void addPost (Post p) {
+
+        ((LinkedList) this.getPostList()).addFirst(p);
+
     }
+
+    // Añade un comentario a la lista de comentarios de un usuario.
+
+    public void addComment (Comment c) {
+
+        this.getCommentList().add(c);
+
+    }
+
+    // Borra un usuario de la lista de posts de un usuario.
+
+    public void deleteFriend (User u) {
+
+        this.getFriendList().remove(u);
+
+    }
+
+    // Borra un post de la lista de posts de un usuario.
+
+    public void deletePost (Post p) {
+
+        this.getPostList().remove(p);
+
+    }
+
+    // Borra un comentario de la lista de comentarios de un usuario.
+
+    public void deleteComment (Comment c) {
+
+        this.getCommentList().remove(c);
+
+    }
+
+    // Muestra sugerencias de usuarios a seguir.
 
     public List <User> friendsSuggestion() {
 
